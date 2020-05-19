@@ -16,5 +16,5 @@ class UserSeeder extends Seeder
                 factory(App\Post::class, 3)->make()->toArray()
             );
         });
-    }
+    } 
 }

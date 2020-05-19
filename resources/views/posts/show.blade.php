@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-8">
+            <div class="col-md-8">
                 <div class="embed-responsive embed-responsive-16by9">
                     <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/JIkhS0AbnoQ?rel=0" allowfullscreen></iframe>
                 </div>
@@ -15,30 +15,23 @@
                     </div>
                 </div>
                 <div class="row mt-3">
-                    <div class="col-6 mb-3">
+                    @foreach($post->materialClasses as $materialClass)
+                    <div class="col-md-6 mb-3">
                         <div class="card">
                             <div class="card-header">
-                                Featured
+                                {{ $materialClass->title }}
                             </div>
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item">Cras justo odio</li>
-                                <li class="list-group-item">Dapibus ac facilisis in</li>
-                                <li class="list-group-item">Vestibulum at eros</li>
+                                @foreach($materialClass->materials as $material)
+                                <li class="list-group-item">
+                                    <span class="float-left">{{ $material->name}}</span>
+                                    <span class="text-muted float-right">{{ $material->unit }}</span>
+                                </li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>
-                    <div class="col-6 mb-3">
-                        <div class="card">
-                            <div class="card-header">
-                                Featured
-                            </div>
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item">Cras justo odio</li>
-                                <li class="list-group-item">Dapibus ac facilisis in</li>
-                                <li class="list-group-item">Vestibulum at eros</li>
-                            </ul>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
                 <ol class="list-unstyled">
                     <li>
@@ -58,7 +51,7 @@
                     </li>
                 </ol>
             </div>
-            <div class="col-4">
+            <div class="col-md-4">
                 <div class="mb-3">내용 더 보기</div>
                 <div class="card mb-2">
                     <div class="card-body">
