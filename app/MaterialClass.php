@@ -11,4 +11,8 @@ class MaterialClass extends Model
     public function post(){
         return $this->belongsTo(Post::class);
     }
+
+    public function materials(){
+        return $this->hasMany(Material::class);
+    }
 }
