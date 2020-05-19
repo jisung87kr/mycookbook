@@ -3,7 +3,7 @@
     <div class="container">
         <div class="row">
         @forelse($posts as $post)
-            <div class="col-3 mb-4">
+            <div class="col-md-3 col-6 mb-4">
                 <div class="card">
                     <img class="card-img-top w-100" src="holder.js/300x180/" alt="">
                     <div class="card-body">
