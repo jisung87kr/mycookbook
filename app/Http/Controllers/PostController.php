@@ -47,7 +47,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        $posts = Post::simplePaginate(10);
+        return view('posts.show', compact('posts', 'post'));
     }
 
     /**
