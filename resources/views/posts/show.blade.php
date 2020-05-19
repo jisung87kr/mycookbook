@@ -34,14 +34,15 @@
                     @endforeach
                 </div>
                 <ol class="list-unstyled">
+                    @foreach($post->recipes as $recipe)
                     <li>
                         <div class="card mt-3">
                             <div class="card-body">
                                 <div class="media">
                                     <div class="media-body">
-                                        <h5 class="mt-0 mb-3">STEP.1</h5>
+                                        <h5 class="mt-0 mb-3">STEP.{{ $recipe->step }}</h5>
                                         <p>
-                                            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                                            {{ $recipe->content }}
                                         </p>
                                     </div>
                                     <img class="mr-3" src="holder.js/200x200/" alt="">
@@ -49,6 +50,7 @@
                             </div>
                         </div>
                     </li>
+                    @endforeach
                 </ol>
             </div>
             <div class="col-md-4">

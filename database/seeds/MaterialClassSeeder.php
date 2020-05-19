@@ -18,6 +18,14 @@ class MaterialClassSeeder extends Seeder
                     factory(App\Material::class, 3)->make()->toArray()
                 );
             });
+
+
+            for($i=1; $i<rand(3, 6); $i++){
+                factory(App\Recipe::class)->create([
+                    'post_id' => $value['id'],
+                    'step' => $i
+                ]);
+            }
         }
     }
 }

@@ -15,4 +15,8 @@ class Post extends Model
     public function materialClasses(){
         return $this->hasMany(MaterialClass::class);
     }
+
+    public function recipes(){
+        return $this->hasMany(Recipe::class);
+    }
 }
