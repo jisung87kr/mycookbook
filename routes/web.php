@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return route()->redirect('posts.index');
+    return redirect()->route('posts.index');
 });
 
 Auth::routes();
