@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 
 class PostController extends Controller
 {
@@ -45,10 +46,40 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post)
+    public function show(Post $post, Request $request)
     {
+        $recentPosts = $request->session()->get('recent_posts');
+        if(!empty($recentPosts)) {
+            if(false !== $key = array_search($post->id, $recentPosts)){
+                // ddd($key);
+                $request->session()->pull('recent_posts.'.$key, $post->id);
+            }
+            $request->session()->push('recent_posts', $post->id);
+        } else {
+            $request->session()->put('recent_posts', [ $post->id ]);
+        }
+
+        $recentArr = $request->session()->get('recent_posts');
+        // $recentArr = array_values($recentArr);
+        // $arr = array_slice($recentArr, count($recentArr)-5, 5);
+        // ddd($arr);
+        $data = [];
+        for($i=0; $i<10; $i++){
+            $val = array_pop($recentArr);
+            if(!empty($val)){
+                array_push($data, $val);
+            }
+        }
+        
+        $recentList = [];
+        foreach($data as $value){
+            $row = Post::find($value);
+            array_push($recentList, $row);
+        }
+        
+        // $recentList = Post::find($request->session()->get('recent_posts'));
         $posts = Post::simplePaginate(10);
-        return view('posts.show', compact('posts', 'post'));
+        return view('posts.show', compact('posts', 'post', 'recentList'));
     }
 
     /**

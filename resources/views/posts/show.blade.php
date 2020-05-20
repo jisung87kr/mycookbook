@@ -72,6 +72,23 @@
                     </div>
                 </div>
                 {{ $posts->links() }}
+                <div class="mt-5 mb-3">읽어본글</div>
+                <div class="card mb-2">
+                    <div class="card-body">
+                        @forelse($recentList as $list)
+                        <div class="media mb-3">
+                            <img class="mr-3" src="holder.js/100x60/" alt="">
+                            <div class="media-body">
+                                <a href="{{ route('posts.show', $list->id) }}">
+                                    <div class="mt-0">{{ $list->title }}</div>
+                                </a>
+                            </div>
+                        </div>
+                        @empty
+                        내용이 없습니다.
+                        @endforelse
+                    </div>
+                </div>
             </div>
         </div>
     </div>
