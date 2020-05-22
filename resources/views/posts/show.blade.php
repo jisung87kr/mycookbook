@@ -93,7 +93,7 @@
                         @endforelse
                     </div>
                 </div>
-                {{ $posts->links() }}
+                {{ $posts->appends(['selected_material' => app('request')->input('selected_material')])->links() }}
                 <div class="mt-5 mb-3">읽어본글</div>
                 <div class="card mb-2">
                     <div class="card-body">
