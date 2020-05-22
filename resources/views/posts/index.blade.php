@@ -37,7 +37,7 @@
                     <div class="card-body">
                         <h4 class="card-title">{{ $post->title }}</h4>
                         <p class="card-text">{{ Str::limit($post->content, $limit = 150, $end = '...') }}</p>
-                        <a href="{{ route('posts.show', [$post->id, 'seleted_material' => $selectedMaterial]) }}" class="stretched-link"></a>
+                        <a href="{{ route('posts.show', [$post->id, 'selected_material' => $selectedMaterial]) }}" class="stretched-link"></a>
                     </div>
                 </div>
             </div>
