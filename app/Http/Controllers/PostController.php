@@ -17,17 +17,18 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        if($request->input('materials')){
-            $materials = explode(",", $request->input('materials'));
-            $posts = Post::with('materialClasses.materials')->whereHas('materialClasses.materials', function($q) use ($materials){
-                 $q->whereIn('name', $materials); 
+        if($request->input('selected_material')){
+            $selectedMaterial = $request->input('selected_material');
+            $posts = Post::with('materialClasses.materials')->whereHas('materialClasses.materials', function($q) use ($selectedMaterial){
+                 $q->whereIn('name', $selectedMaterial); 
             })->paginate(12);
         } else {
             $posts = Post::paginate(12);
+            $selectedMaterial = null;
         }
         
         $materials = Material::select(DB::raw('name, count(*) as cnt'))->groupBy('name')->orderBy('cnt', 'desc')->get();
-        return view('posts.index', compact('posts', 'materials'))->with('materials', $materials);
+        return view('posts.index', compact('posts', 'materials', 'selectedMaterial'))->with('selected_material', $selectedMaterial);
     }
 
     /**
