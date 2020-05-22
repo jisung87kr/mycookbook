@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Post;
+use App\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -13,10 +15,19 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::paginate(10);
-        return view('posts.index', compact('posts'));
+        if($request->input('materials')){
+            $materials = explode(",", $request->input('materials'));
+            $posts = Post::with('materialClasses.materials')->whereHas('materialClasses.materials', function($q) use ($materials){
+                 $q->whereIn('name', $materials); 
+            })->paginate(12);
+        } else {
+            $posts = Post::paginate(12);
+        }
+        
+        $materials = Material::select(DB::raw('name, count(*) as cnt'))->groupBy('name')->orderBy('cnt', 'desc')->get();
+        return view('posts.index', compact('posts', 'materials'))->with('materials', $materials);
     }
 
     /**
