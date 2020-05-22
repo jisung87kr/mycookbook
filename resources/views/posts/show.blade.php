@@ -26,12 +26,32 @@
                                 <li class="list-group-item">
                                     <span class="float-left">{{ $material->name}}</span>
                                     <span class="text-muted float-right">{{ $material->unit }}</span>
+                                    @if(app('request')->input('selected_material'))
+                                        @if(in_array($material->name, app('request')->input('selected_material')))
+                                        <svg class="bi bi-check-circle float-left ml-2 mt-1" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" color="green" data-toggle="tooltip" data-placement="top" title="가지고 있는 재료">
+                                            <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L8 9.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>
+                                            <path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1013.5 8a.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63.5.5 0 11-.5.865A5.472 5.472 0 008 2.5z" clip-rule="evenodd"/>
+                                        </svg>
+                                        @endif
+                                    @endif
                                 </li>
                                 @endforeach
                             </ul>
                         </div>
                     </div>
                     @endforeach
+                </div>
+                <div class="card store">
+                    <div class="card-body">
+                        <h4 class="mb-3 text-center">부족한 요리재료를 구매하세요</h4>
+                        <!-- <iframe src="https://coupa.ng/bCTGY8" width="100%" height="44" frameborder="0" scrolling="no"></iframe> -->
+                        <iframe src="https://coupa.ng/bCTGZa" width="100%" height="36" frameborder="0" scrolling="no" class="mb-1"></iframe>
+                        @if($materialList)  
+                            @foreach($materialList as $item)
+                                <span class="btn btn-dark btn-sm">{{ $item }}</span>
+                            @endforeach
+                        @endif
+                    </div>
                 </div>
                 <ol class="list-unstyled">
                     @foreach($post->recipes as $recipe)
@@ -92,4 +112,9 @@
             </div>
         </div>
     </div>
+    <script>
+    window.addEventListener('load', function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    })
+    </script>
 @endsection

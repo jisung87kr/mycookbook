@@ -7,6 +7,7 @@ use App\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class PostController extends Controller
 {
@@ -63,7 +64,6 @@ class PostController extends Controller
         $recentPosts = $request->session()->get('recent_posts');
         if(!empty($recentPosts)) {
             if(false !== $key = array_search($post->id, $recentPosts)){
-                // ddd($key);
                 $request->session()->pull('recent_posts.'.$key, $post->id);
             }
             $request->session()->push('recent_posts', $post->id);
@@ -72,9 +72,6 @@ class PostController extends Controller
         }
 
         $recentArr = $request->session()->get('recent_posts');
-        // $recentArr = array_values($recentArr);
-        // $arr = array_slice($recentArr, count($recentArr)-5, 5);
-        // ddd($arr);
         $data = [];
         for($i=0; $i<10; $i++){
             $val = array_pop($recentArr);
@@ -89,9 +86,22 @@ class PostController extends Controller
             array_push($recentList, $row);
         }
         
-        // $recentList = Post::find($request->session()->get('recent_posts'));
-        $posts = Post::simplePaginate(10);
-        return view('posts.show', compact('posts', 'post', 'recentList'));
+        $posts = Post::with('materialClasses.materials')->simplePaginate(10);
+        $selectedItems = $request->input('selected_material');
+        if($selectedItems){
+            // $notExistMaterials = $post->with('materialClasses.materials')->find($post->id);
+            $arr = Arr::pluck($post->materialClasses, 'id');
+            $data = Material::select('name')->whereIn('material_class_id', $arr)->groupBy('name')->get();
+            $materialList = Arr::pluck($data, 'name');
+            foreach ($selectedItems as $key => $value) {
+                $key = array_search($value, $materialList);
+                array_splice($materialList, $key, 1);
+            }
+        } else {
+            $materialList = null;
+        }
+        
+        return view('posts.show', compact('posts', 'post', 'recentList', 'materialList'));
     }
 
     /**
