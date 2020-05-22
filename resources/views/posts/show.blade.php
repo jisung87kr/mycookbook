@@ -48,7 +48,9 @@
                         <iframe src="https://coupa.ng/bCTGZa" width="100%" height="36" frameborder="0" scrolling="no" class="mb-1"></iframe>
                         @if($materialList)  
                             @foreach($materialList as $item)
-                                <span class="btn btn-dark btn-sm">{{ $item }}</span>
+                                <a href="{{ app('App\Http\Controllers\PostController')->coupang($item) }}" target="_blank">
+                                    <span class="btn-dark btn-sm">{{ $item }}</span>
+                                </a>
                             @endforeach
                         @endif
                     </div>

@@ -137,4 +137,39 @@ class PostController extends Controller
     {
         //
     }
+
+    public function coupang($word){
+        date_default_timezone_set("GMT+0");
+        $datetime = date("ymd").'T'.date("His").'Z';
+        $method = "POST";
+        $path = "/v2/providers/affiliate_open_api/apis/openapi/v1/deeplink";
+        $message = $datetime.$method.str_replace("?", "", $path);
+        $ACCESS_KEY = "5f4fdb1c-8f62-4077-a86b-b14a947c99d7";
+        $SECRET_KEY = "42fffbad486940fffbd4db89aa6ffb504312d3d1";
+        $algorithm = "HmacSHA256";
+        $signature = hash_hmac('sha256', $message, $SECRET_KEY);
+        // print($message."\n".$SECRET_KEY."\n".$signature."\n");
+        $authorization  = "CEA algorithm=HmacSHA256, access-key=".$ACCESS_KEY.", signed-date=".$datetime.", signature=".$signature;
+        $url = 'https://api-gateway.coupang.com'.$path;
+        $strjson='
+            {
+                "coupangUrls": [
+                    "https://www.coupang.com/np/search?component=&q='.$word.'&channel=user"
+                ]
+            }
+        ';
+
+        $curl = curl_init();        
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type:  application/json;charset=UTF-8", "Authorization:".$authorization));        
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $strjson);
+        $result = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+        $data = json_decode($result);
+        return $data->data[0]->shortenUrl;
+    }
 }
