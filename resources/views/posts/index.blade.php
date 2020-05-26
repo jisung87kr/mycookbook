@@ -11,7 +11,7 @@
                     <div class="overflow-auto mb-3 material_list">
                         <div class="row" style="height: 200px">
                             @foreach($materials as $key => $material)
-                            <div class="col-lg-2">
+                            <div class="col-6 col-md-4 col-lg-2">
                                 <div class="form-check">
                                     <input type="checkbox"
                                     class="form-check-input"
@@ -34,7 +34,7 @@
             <div class="col-12">
                 <div class="alert alert-primary" role="alert">
                     @foreach($selectedMaterial as $material)
-                    {{ $material }}@if(!$loop->last),@endif
+                    '{{ $material }}'@if(!$loop->last),@endif
                     @endforeach
                     와 관련된 {{ $posts->total() }}개의 레시피가 조회되었습니다.
                 </div>
@@ -42,13 +42,12 @@
             @elseif((app('request')->input('taxonomy')))
             <div class="col-12">
                 <div class="alert alert-primary" role="alert">
-                    
-                    {{App\term::where('slug', app('request')->input('taxonomy'))->value('name').' 에 대한 '.$posts->total() }}개의 레시피가 조회되었습니다.
+                    '{{App\term::where('slug', app('request')->input('taxonomy'))->value('name')}}' 에 대한 {{ $posts->total() }}개의 레시피가 조회되었습니다.
                 </div>
             </div>
             @endif
         @forelse($posts as $post)
-            <div class="col-md-3 col-6 mb-4">
+            <div class="col-lg-3 col-md-4 col-6 mb-4">
                 <div class="card">
                     <img class="card-img-top w-100" src="holder.js/300x180/" alt="">
                     <div class="card-body">

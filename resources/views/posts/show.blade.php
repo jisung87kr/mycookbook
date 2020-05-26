@@ -2,7 +2,7 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <div class="embed-responsive embed-responsive-16by9">
                     <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/JIkhS0AbnoQ?rel=0" allowfullscreen></iframe>
                 </div>
@@ -76,7 +76,7 @@
                     @endforeach
                 </ol>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-4">
                 <div class="mb-3">내용 더 보기</div>
                 <div class="card mb-2">
                     <div class="card-body">
