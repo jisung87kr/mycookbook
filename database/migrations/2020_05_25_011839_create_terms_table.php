@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMaterialsTable extends Migration
+class CreateTermsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,11 @@ class CreateMaterialsTable extends Migration
      */
     public function up()
     {
-        Schema::create('materials', function (Blueprint $table) {
+        Schema::create('terms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('material_class_id')->constrained()->onDelete('cascade');
-            $table->string('name', 20);
-            $table->string('unit', 20);
-            $table->timestamps();
+            $table->string('name', 200)->index();
+            $table->string('slug', 200)->unique();
+            // $table->timestamps();
         });
     }
 
@@ -29,6 +28,6 @@ class CreateMaterialsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('materials');
+        Schema::dropIfExists('terms');
     }
 }

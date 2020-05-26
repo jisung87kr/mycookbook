@@ -19,4 +19,8 @@ class Post extends Model
     public function recipes(){
         return $this->hasMany(Recipe::class);
     }
+
+    public function taxonomies(){
+        return $this->belongsToMany(Taxonomy::class, 'term_relationships');
+    }
 }
