@@ -30,14 +30,33 @@
             </div>
         </div>
         <div class="row">
+            @if(app('request')->input('selected_material'))
+            <div class="col-12">
+                <div class="alert alert-primary" role="alert">
+                    @foreach($selectedMaterial as $material)
+                    {{ $material }}@if(!$loop->last),@endif
+                    @endforeach
+                    와 관련된 {{ $posts->total() }}개의 레시피가 조회되었습니다.
+                </div>
+            </div>
+            @elseif((app('request')->input('taxonomy')))
+            <div class="col-12">
+                <div class="alert alert-primary" role="alert">
+                    
+                    {{App\term::where('slug', app('request')->input('taxonomy'))->value('name').' 에 대한 '.$posts->total() }}개의 레시피가 조회되었습니다.
+                </div>
+            </div>
+            @endif
         @forelse($posts as $post)
             <div class="col-md-3 col-6 mb-4">
                 <div class="card">
                     <img class="card-img-top w-100" src="holder.js/300x180/" alt="">
                     <div class="card-body">
-                        <h4 class="card-title">{{ $post->title }}</h4>
-                        <p class="card-text">{{ Str::limit($post->content, $limit = 150, $end = '...') }}</p>
-                        <a href="{{ route('posts.show', [$post->id, 'selected_material' => $selectedMaterial]) }}" class="stretched-link"></a>
+                        <a href="{{ route('posts.show', [$post->id, 'selected_material' => $selectedMaterial]) }}" class="text-dark">
+                            <h4 class="card-title">{{ $post->title }}</h4>
+                            <p class="card-text">{{ Str::limit($post->content, $limit = 150, $end = '...') }}</p>
+                        </a>
+                        @include('posts.includes.taxonomy', ['post' => $post])
                     </div>
                 </div>
             </div>
@@ -45,6 +64,9 @@
             <div class="col-12">내용이 없습니다.</div>
         @endforelse
         </div>
-        {{ $posts->appends(['selected_material' => $selectedMaterial])->links() }}
+        {{ $posts->appends([
+            'selected_material' => $selectedMaterial,
+            'taxonomy' => app('request')->input('taxonomy')
+        ])->links() }}
     </div>
 @endsection

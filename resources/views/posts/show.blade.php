@@ -12,6 +12,7 @@
                         <div class="small">{{ $post->updated_at->diffForHumans() }}</div>
                         <hr/>
                         <p class="card-text">{{ $post->content }}</p>
+                        @include('posts.includes.taxonomy', ['post' => $post])
                     </div>
                 </div>
                 <div class="row mt-3">

@@ -20,12 +20,19 @@ class PostController extends Controller
     {
         if($request->input('selected_material')){
             $selectedMaterial = $request->input('selected_material');
-            $posts = Post::with('materialClasses.materials')->whereHas('materialClasses.materials', function($q) use ($selectedMaterial){
+            $posts = Post::with('materialClasses.materials', 'taxonomies')->whereHas('materialClasses.materials', function($q) use ($selectedMaterial){
                  $q->whereIn('name', $selectedMaterial); 
             })->paginate(12);
         } else {
-            $posts = Post::paginate(12);
+            $posts = Post::with('materialClasses.materials', 'taxonomies')->paginate(12);
             $selectedMaterial = null;
+        }
+
+        if($request->input('taxonomy')){
+            $taxonomy = $request->input('taxonomy');
+            $posts = Post::with('materialClasses.materials', 'taxonomies')->whereHas('taxonomies.term', function($q) use ($taxonomy){
+                 $q->where('slug', $taxonomy);
+            })->paginate(12);
         }
         
         $materials = Material::select(DB::raw('name, count(*) as cnt'))->groupBy('name')->orderBy('cnt', 'desc')->get();
@@ -139,6 +146,7 @@ class PostController extends Controller
     }
 
     public function coupang($word){
+        return $word;
         date_default_timezone_set("GMT+0");
         $datetime = date("ymd").'T'.date("His").'Z';
         $method = "POST";
@@ -154,7 +162,7 @@ class PostController extends Controller
         $strjson='
             {
                 "coupangUrls": [
-                    "https://www.coupang.com/np/search?component=&q='.$word.'&channel=user"
+                    "https://www.coupang.com/np/search?component=&q='.$word.'&channel=user",
                 ]
             }
         ';
