@@ -18,7 +18,6 @@ class CreateMaterialsTable extends Migration
             $table->foreignId('material_class_id')->constrained()->onDelete('cascade');
             $table->string('name', 20);
             $table->string('unit', 20);
-            $table->timestamps();
         });
     }
 

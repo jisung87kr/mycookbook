@@ -20,17 +20,17 @@ class PostController extends Controller
     {
         if($request->input('selected_material')){
             $selectedMaterial = $request->input('selected_material');
-            $posts = Post::with('materialClasses.materials', 'taxonomies')->whereHas('materialClasses.materials', function($q) use ($selectedMaterial){
+            $posts = Post::with('materialClasses.materialUnits.material', 'taxonomies')->whereHas('materialClasses.materialUnits.material', function($q) use ($selectedMaterial){
                  $q->whereIn('name', $selectedMaterial); 
             })->paginate(12);
         } else {
-            $posts = Post::with('materialClasses.materials', 'taxonomies')->paginate(12);
+            $posts = Post::with('materialClasses.materialUnits.material', 'taxonomies')->paginate(12);
             $selectedMaterial = null;
         }
 
         if($request->input('taxonomy')){
             $taxonomy = $request->input('taxonomy');
-            $posts = Post::with('materialClasses.materials', 'taxonomies')->whereHas('taxonomies.term', function($q) use ($taxonomy){
+            $posts = Post::with('materialClasses.materialUnits.material', 'taxonomies')->whereHas('taxonomies.term', function($q) use ($taxonomy){
                  $q->where('slug', $taxonomy);
             })->paginate(12);
         }
@@ -93,17 +93,17 @@ class PostController extends Controller
             array_push($recentList, $row);
         }
         
-        $posts = Post::with('materialClasses.materials')->simplePaginate(10);
+        $posts = Post::with('materialClasses.materialUnits.material')->simplePaginate(10);
         $selectedItems = $request->input('selected_material');
+        $materialList = null;
+
         if($selectedItems){
-            // $notExistMaterials = $post->with('materialClasses.materials')->find($post->id);
-            $arr = Arr::pluck($post->materialClasses, 'id');
-            $data = Material::select('name')->whereIn('material_class_id', $arr)->groupBy('name')->get();
-            $materialList = Arr::pluck($data, 'name');
-            foreach ($selectedItems as $key => $value) {
-                $key = array_search($value, $materialList);
-                array_splice($materialList, $key, 1);
-            }
+            $materialList = \App\MaterialClass::where('post_id', $post->id)
+            ->leftJoin('material_relationships', 'material_classes.id', '=', 'material_class_id')
+            ->leftJoin('material_units', 'material_units.id', '=', 'material_unit_id')
+            ->leftjoin('materials', 'material_units.material_id', '=', 'materials.id')
+            ->whereNotIn('name', $selectedItems)
+            ->get()->pluck('name');
         } else {
             $materialList = null;
         }

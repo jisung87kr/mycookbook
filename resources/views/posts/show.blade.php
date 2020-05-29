@@ -23,12 +23,12 @@
                                 {{ $materialClass->title }}
                             </div>
                             <ul class="list-group list-group-flush">
-                                @foreach($materialClass->materials as $material)
+                                @foreach($materialClass->materialUnits as $material)
                                 <li class="list-group-item">
-                                    <span class="float-left">{{ $material->name}}</span>
+                                    <span class="float-left">{{ $material->material->name}}</span>
                                     <span class="text-muted float-right">{{ $material->unit }}</span>
                                     @if(app('request')->input('selected_material'))
-                                        @if(in_array($material->name, app('request')->input('selected_material')))
+                                        @if(in_array($material->material->name, app('request')->input('selected_material')))
                                         <svg class="bi bi-check-circle float-left ml-2 mt-1" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" color="green" data-toggle="tooltip" data-placement="top" title="가지고 있는 재료">
                                             <path fill-rule="evenodd" d="M15.354 2.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3-3a.5.5 0 11.708-.708L8 9.293l6.646-6.647a.5.5 0 01.708 0z" clip-rule="evenodd"/>
                                             <path fill-rule="evenodd" d="M8 2.5A5.5 5.5 0 1013.5 8a.5.5 0 011 0 6.5 6.5 0 11-3.25-5.63.5.5 0 11-.5.865A5.472 5.472 0 008 2.5z" clip-rule="evenodd"/>

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRecipesTable extends Migration
+class CreateMaterialRelationshipsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class CreateRecipesTable extends Migration
      */
     public function up()
     {
-        Schema::create('recipes', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('step');
-            $table->longText('content');
+        Schema::create('material_relationships', function (Blueprint $table) {
+            $table->foreignId('material_class_id')->constrained();
+            $table->foreignId('material_unit_id')->constrained();
         });
     }
 
@@ -28,6 +26,6 @@ class CreateRecipesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('recipes');
+        Schema::dropIfExists('material_relationships');
     }
 }

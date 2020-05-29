@@ -17,7 +17,6 @@ class CreateMaterialClassesTable extends Migration
             $table->id();
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->string('title', 100);
-            $table->timestamps();
         });
     }
 

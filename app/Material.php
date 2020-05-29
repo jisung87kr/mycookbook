@@ -6,9 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Material extends Model
 {
-    protected $fillable = ['name', 'unit'];
+    public $timestamps = false;
+    protected $fillable = ['name', 'slug', 'link'];
 
-    public function material_class(){
-        return $this->belongsTo(MaterialClass::class);
+    public function materialUnit(){
+        return $this->hasOne(MaterialUnit::class);
     }
+
+    // public function material_class(){
+    //     return $this->belongsTo(MaterialClass::class);
+    // }
 }
