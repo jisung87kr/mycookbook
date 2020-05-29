@@ -103,11 +103,10 @@ class PostController extends Controller
             ->leftJoin('material_units', 'material_units.id', '=', 'material_unit_id')
             ->leftjoin('materials', 'material_units.material_id', '=', 'materials.id')
             ->whereNotIn('name', $selectedItems)
-            ->get()->pluck('name');
+            ->get();
         } else {
             $materialList = null;
         }
-        
         return view('posts.show', compact('posts', 'post', 'recentList', 'materialList'));
     }
 
