@@ -25,7 +25,6 @@ class UserSeeder extends Seeder
             $post->comments()->createMany(
                 factory(App\Comment::class, 5)->make([
                     'user_id' => $faker->randomElement($users->pluck('id')),
-                    'parent' => 0
                 ])->toArray()
             );
         });
