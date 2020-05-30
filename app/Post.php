@@ -23,4 +23,8 @@ class Post extends Model
     public function taxonomies(){
         return $this->belongsToMany(Taxonomy::class, 'term_relationships');
     }
+
+    public function comments(){
+        return $this->morphMany(comment::class, 'commentable');
+    }
 }
