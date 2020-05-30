@@ -26,4 +26,8 @@ class Post extends Model
     public function comments(){
         return $this->morphMany(comment::class, 'commentable');
     }
+
+    public function attachments(){
+        return $this->morphMany(Attachment::class, 'attachmentable');
+    }
 }
