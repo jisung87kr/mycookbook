@@ -68,13 +68,16 @@
                                             {{ $recipe->content }}
                                         </p>
                                     </div>
-                                    <img class="mr-3" src="holder.js/200x200/" alt="">
+                                    <img class="ml-3" src="holder.js/200x200/" alt="">
                                 </div>
                             </div>
                         </div>
                     </li>
                     @endforeach
                 </ol>
+                <div class="commentbox mt-5">
+                    @include('comments.index')
+                </div>
             </div>
             <div class="col-lg-4">
                 <div class="mb-3">내용 더 보기</div>

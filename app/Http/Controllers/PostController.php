@@ -107,7 +107,9 @@ class PostController extends Controller
         } else {
             $materialList = null;
         }
-        return view('posts.show', compact('posts', 'post', 'recentList', 'materialList'));
+
+        $comments = $post->comments()->with('comments')->where('parent', null)->latest()->get();
+        return view('posts.show', compact('posts', 'post', 'recentList', 'materialList', 'comments'));
     }
 
     /**

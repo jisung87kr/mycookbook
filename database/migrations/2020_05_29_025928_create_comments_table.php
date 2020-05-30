@@ -19,7 +19,7 @@ class CreateCommentsTable extends Migration
             $table->string('commentable_type');
             $table->unsignedBigInteger('commentable_id');
             $table->longText('comment');
-            $table->unsignedBigInteger('parent');
+            $table->unsignedBigInteger('parent')->nullable()->default(null);
             $table->timestamps();
         });
     }
