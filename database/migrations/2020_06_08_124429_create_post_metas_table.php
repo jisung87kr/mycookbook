@@ -16,8 +16,8 @@ class CreatePostMetasTable extends Migration
         Schema::create('post_metas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
-            $table->string('key');
-            $table->string('value');
+            $table->string('key')->nullable();
+            $table->string('value')->nullable();
             $table->timestamps();
         });
     }

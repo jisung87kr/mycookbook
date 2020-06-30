@@ -13,7 +13,7 @@ class MaterialClassSeeder extends Seeder
     {
         $faker = Faker\Factory::create();
         $materials = factory(App\Material::class, 50)->create()->each(function($material){
-            $material->materialUnit()->save(factory(App\MaterialUnit::class)->make());
+            $material->materialUnits()->save(factory(App\MaterialUnit::class)->make());
         });
         $unitIds = App\MaterialUnit::all()->pluck("id")->toArray();
 

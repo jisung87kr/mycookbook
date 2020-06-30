@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MaterialUnit extends Model
 {
+    protected $fillable = ['unit'];
+
     public $timestamps = false;
 
     public function materialClasses(){

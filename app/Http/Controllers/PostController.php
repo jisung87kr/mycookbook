@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Post;
 use App\Material;
+use App\Http\Requests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
@@ -55,9 +56,78 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Requests\FormRequestPost $request)
     {
-        //
+        $validated = $request->validated();
+        // ddd($request->recipe, $validated);
+        $post = $request->user()->posts()->create($validated);
+        $this->storeMeta($post, $request);
+        $this->storeMaterial($post, $request);
+        $this->storeRecipe($post, $request);
+        return redirect()->route('posts.show', $post->id);
+    }
+
+    public function storeMeta($post, $request){
+        if(isset($request->meta)){
+            foreach($request->meta as $key => $val){
+                $post->postMetas()->create([
+                    'key' => $key,
+                    'value' => $val
+                ]);
+            }
+        } else {
+            ddd('meta가 존재하지 않습니다');
+        }
+    }
+
+    public function storeMaterial($post, $request){
+        // 재료클래스 인서트
+        // 재료가 존재 하는지 검사해서 있으면 아이디 반환 없으면 인서트후 아이디 반환
+        // 재료아이디를 참조해서 재료단위 인서트 후 아이디리스트 반환
+        // 재료클리스와 재료단위를 sync
+        
+        if(isset($request->material)){
+            foreach($request->material as $key => $val){
+                $materialClass = $post->materialClasses()->create([
+                   'title' => $val['title']
+                ]);
+                
+                $unitIds = [];
+                foreach($val['item'] as $k =>$v){
+                    $findMaterial = Material::where('name', $v['name'])->first();
+                    if(!$findMaterial){
+                        $material = Material::create([
+                            'name' => $v['name'],
+                            'slug' => $v['name'],
+                            'link' => 'link~~'
+                        ]);
+                    } else {
+                        $material = $findMaterial;
+                    }
+
+                    $unit = $material->materialUnits()->create([
+                        'unit' => $v['unit']
+                    ]);
+
+                    $unitIds[] = $unit->id;
+                }
+
+                $materialClass->materialUnits()->sync($unitIds);
+            }
+        } else {
+            ddd('material class가 존재하지 않습니다.');
+        }
+    }
+
+    public function storeRecipe($post, $request){
+        if(isset($request->recipe)){
+            foreach($request->recipe as $key => $val){
+                $post->recipes()->create([
+                    'step' => $key,
+                    'content' => $val['content']
+                ]);
+            }
+        }
     }
 
     /**
