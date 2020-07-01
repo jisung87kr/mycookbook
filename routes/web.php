@@ -21,3 +21,10 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 Route::resource('/posts', 'PostController');
+Route::get('/test', function(){
+    return view('test');
+})->name('test');
+
+Route::post('/ck', function(){
+    ddd(request()->all());
+})->name('ck');

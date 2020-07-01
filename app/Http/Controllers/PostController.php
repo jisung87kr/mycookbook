@@ -58,8 +58,8 @@ class PostController extends Controller
      */
     public function store(Requests\FormRequestPost $request)
     {
+        // ddd($request->all());
         $validated = $request->validated();
-        // ddd($request->recipe, $validated);
         $post = $request->user()->posts()->create($validated);
         $this->storeMeta($post, $request);
         $this->storeMaterial($post, $request);
@@ -121,11 +121,13 @@ class PostController extends Controller
 
     public function storeRecipe($post, $request){
         if(isset($request->recipe)){
+            $i=1;
             foreach($request->recipe as $key => $val){
                 $post->recipes()->create([
-                    'step' => $key,
+                    'step' => $i,
                     'content' => $val['content']
                 ]);
+                $i++;
             }
         }
     }
