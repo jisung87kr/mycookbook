@@ -29,14 +29,44 @@
             </ul>
     </small>
 </div>
+<div class="form-group">
+  <label for="tag">태그</label>
+  <input type="text" name="tag" id="tag" class="form-control" placeholder="" aria-describedby="helpId" data-role="tagsinput" value="">
+</div>
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('lib/tagsinput/bootstrap-tagsinput.css') }}">
+@endpush
+@push('scripts')
+    <script src="{{ asset('lib/tagsinput/bootstrap-tagsinput.js') }}" defer></script>
+@endpush
 @include('posts.includes/materialbox')
 @include('posts.includes/recipebox')
 <div class="justify-content-center d-flex">
     <input type="submit" value="취소" class="btn btn-outline-primary mt-3 mr-2">
     <input type="submit" value="저장" class="btn btn-primary mt-3">
 </div>
-<script>
+<script defer>
     window.addEventListener("load", function(){
+        $("form").bind("keypress", function (e) {
+            if (e.keyCode == 13) {
+                return false;
+            }
+        });
+
+        $('#tag').tagsinput({
+            tagClass: 'badge badge-primary', 
+        });
+
+        $('.bootstrap-tagsinput input').keydown(function(e){
+            var val = $(this).val();
+            val = val.replace('#', '');
+            $(this).val(val);
+        })
+
+        $('#tag').on('itemAdded', function(event) {
+            console.log($("#tag").val());
+        });
+
         $('[data-toggle="tooltip"]').tooltip();
 
         $(".materialbox__inner").sortable();

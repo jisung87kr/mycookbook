@@ -6,6 +6,8 @@ use App\Post;
 use App\Material;
 use App\PostMeta;
 use App\Recipe;
+use App\Term;
+use App\Taxonomy;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -64,6 +66,7 @@ class PostController extends Controller
         $validated = $request->validated();
         $post = $request->user()->posts()->create($validated);
         $this->storeMeta($post, $request);
+        $this->storeTag($post, $request);
         $this->storeMaterial($post, $request);
         $this->storeRecipe($post, $request);
         return redirect()->route('posts.show', $post->id);
@@ -82,8 +85,49 @@ class PostController extends Controller
         }
     }
 
+    public function storeTag($post, $request){
+        if(isset($request->tag)){
+            $termIds = [];
+            $tagArr = explode(',', $request->tag);
+            foreach($tagArr as $key => $val){
+                //terms 테이블에 해당 용어가 있는지 확인해서 없으면 인서트, 아이디 반환
+                //텍소노미테이블에 아이디를 이용해서 내용저장 || 아이디,텍소노미를 검색해서 용어가 있으면 count 증가
+                $data = [
+                    'taxonomy' => 'tag',
+                    'description' => null,
+                    'parent' => 0,
+                    'count' => 0
+                ];
+                $term = Term::where('name', $val)->first();
+                if(!$term){
+                    $term = Term::create([
+                        'name' => $val,
+                        'slug' => $val
+                    ]);
+                }
+                $data['id'] = $term->id;
+                array_push($termIds, $data['id']);
+                $this->storeTaxonomy($post, $data);
+            }
+            $post->taxonomies()->sync($termIds);
+        }
+    }
+
+    public function storeTaxonomy($post, $term){
+        if(Taxonomy::find($term['id'])){
+            Taxonomy::find($term['id'])->increment('count');
+        } else {
+            Taxonomy::create([
+                'term_id' => $term['id'],
+                'taxonomy' => $term['taxonomy'],
+                'description' => $term['description'],
+                'parent' => $term['parent'],
+                'count' => 0
+            ]);
+        }
+    }
+
     public function storeMaterial($post, $request){
-        // ddd($request->all());
         if(isset($request->material)){
             if(!$post->materialClasses->isEmpty()){
                 $post->materialClasses()->delete();

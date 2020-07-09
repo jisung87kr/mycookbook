@@ -15,9 +15,9 @@ class CreateTaxonomiesTable extends Migration
     {
         Schema::create('taxonomies', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('term_id')->nullable();
+            $table->unsignedBigInteger('term_id')->constrain()->onDelete('cascade')->nullable();
             $table->string('taxonomy', 32)->index();
-            $table->longText('description');
+            $table->longText('description')->nullable();
             $table->unsignedBigInteger('parent')->default(0);
             $table->unsignedBigInteger('count')->default(0);
             // $table->timestamps();

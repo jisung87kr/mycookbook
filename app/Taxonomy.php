@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Taxonomy extends Model
 {
+    protected $fillable = ['term_id', 'taxonomy', 'description', 'parent', 'count'];
     public $timestamps = false;
     // public function termRelationships(){
     //     return $this->hasMany(TermRelationship::class);
