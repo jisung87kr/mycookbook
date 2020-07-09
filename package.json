@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "holderjs": "^2.9.7",
+        "jquery-ui": "^1.12.1",
         "material-design-icons": "^3.0.1"
     }
 }

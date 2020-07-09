@@ -14,8 +14,8 @@ class CreateMaterialRelationshipsTable extends Migration
     public function up()
     {
         Schema::create('material_relationships', function (Blueprint $table) {
-            $table->foreignId('material_class_id')->constrained();
-            $table->foreignId('material_unit_id')->constrained();
+            $table->foreignId('material_class_id')->constrained()->onDelete('cascade');
+            $table->foreignId('material_unit_id')->constrained()->onDelete('cascade');
         });
     }
 

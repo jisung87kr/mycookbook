@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Post;
 use App\Material;
+use App\PostMeta;
+use App\Recipe;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
@@ -23,9 +25,9 @@ class PostController extends Controller
             $selectedMaterial = $request->input('selected_material');
             $posts = Post::with('materialClasses.materialUnits.material', 'taxonomies')->whereHas('materialClasses.materialUnits.material', function($q) use ($selectedMaterial){
                  $q->whereIn('name', $selectedMaterial); 
-            })->paginate(12);
+            })->latest()->paginate(12);
         } else {
-            $posts = Post::with('materialClasses.materialUnits.material', 'taxonomies')->paginate(12);
+            $posts = Post::with('materialClasses.materialUnits.material', 'taxonomies')->latest()->paginate(12);
             $selectedMaterial = null;
         }
 
@@ -33,7 +35,7 @@ class PostController extends Controller
             $taxonomy = $request->input('taxonomy');
             $posts = Post::with('materialClasses.materialUnits.material', 'taxonomies')->whereHas('taxonomies.term', function($q) use ($taxonomy){
                  $q->where('slug', $taxonomy);
-            })->paginate(12);
+            })->latest()->paginate(12);
         }
         
         $materials = Material::select(DB::raw('name, count(*) as cnt'))->groupBy('name')->orderBy('cnt', 'desc')->get();
@@ -47,7 +49,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        return view('posts.create');
+        $post = new Post;
+        return view('posts.create', compact('post'));
     }
 
     /**
@@ -58,7 +61,6 @@ class PostController extends Controller
      */
     public function store(Requests\FormRequestPost $request)
     {
-        // ddd($request->all());
         $validated = $request->validated();
         $post = $request->user()->posts()->create($validated);
         $this->storeMeta($post, $request);
@@ -81,19 +83,19 @@ class PostController extends Controller
     }
 
     public function storeMaterial($post, $request){
-        // 재료클래스 인서트
-        // 재료가 존재 하는지 검사해서 있으면 아이디 반환 없으면 인서트후 아이디 반환
-        // 재료아이디를 참조해서 재료단위 인서트 후 아이디리스트 반환
-        // 재료클리스와 재료단위를 sync
-        
+        // ddd($request->all());
         if(isset($request->material)){
+            if(!$post->materialClasses->isEmpty()){
+                $post->materialClasses()->delete();
+            }
+            
             foreach($request->material as $key => $val){
                 $materialClass = $post->materialClasses()->create([
                    'title' => $val['title']
                 ]);
                 
                 $unitIds = [];
-                foreach($val['item'] as $k =>$v){
+                foreach($val['item'] as $k => $v){
                     $findMaterial = Material::where('name', $v['name'])->first();
                     if(!$findMaterial){
                         $material = Material::create([
@@ -123,10 +125,17 @@ class PostController extends Controller
         if(isset($request->recipe)){
             $i=1;
             foreach($request->recipe as $key => $val){
-                $post->recipes()->create([
-                    'step' => $i,
-                    'content' => $val['content']
-                ]);
+                if(isset($val['id'])){
+                    Recipe::find($val['id'])->update([
+                        'step' => $i,
+                        'content' => $val['content']
+                    ]);
+                } else {
+                    $post->recipes()->create([
+                        'step' => $i,
+                        'content' => $val['content']
+                    ]);
+                }
                 $i++;
             }
         }
@@ -192,7 +201,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('posts.edit', compact('post'));
     }
 
     /**
@@ -202,9 +211,21 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(Requests\FormRequestPost $request, Post $post)
     {
-        //
+        // ddd($request->all());
+        $validated = $request->validated();
+        $post->update($validated);
+        $this->updateMeta($request);
+        $this->storeMaterial($post, $request);
+        $this->storeRecipe($post, $request);
+        return redirect()->route('posts.show', $post->id);
+    }
+
+    public function updateMeta($request){
+        PostMeta::find($request->meta['id'])->update([
+            'value' => $request->meta['__video']
+        ]);
     }
 
     /**
@@ -252,5 +273,13 @@ class PostController extends Controller
         curl_close($curl);
         $data = json_decode($result);
         return $data->data[0]->shortenUrl;
+    }
+
+    public function getPostMeta($post, $key){
+        $meta = PostMeta::where([
+            'post_id' => $post->id,
+            'key' => $key
+        ])->first();
+        return $meta;
     }
 }

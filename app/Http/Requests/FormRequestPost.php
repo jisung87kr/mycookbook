@@ -25,7 +25,11 @@ class FormRequestPost extends FormRequest
     {
         return [
             'title' => 'required|max:100',
-            'content' => 'required'
+            'content' => 'required',
+            'material.title.*' => 'required',
+            'material.item.name.*' => 'required',
+            'material.item.unit.*' => 'required',
+            'recipe.*' => 'required',
         ];
     }
 }
