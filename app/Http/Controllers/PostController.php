@@ -261,6 +261,7 @@ class PostController extends Controller
         $validated = $request->validated();
         $post->update($validated);
         $this->updateMeta($request);
+        $this->storeTag($post, $request);
         $this->storeMaterial($post, $request);
         $this->storeRecipe($post, $request);
         return redirect()->route('posts.show', $post->id);

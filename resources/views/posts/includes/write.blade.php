@@ -31,7 +31,7 @@
 </div>
 <div class="form-group">
   <label for="tag">태그</label>
-  <input type="text" name="tag" id="tag" class="form-control" placeholder="" aria-describedby="helpId" data-role="tagsinput" value="">
+  <input type="text" name="tag" id="tag" class="form-control" placeholder="" aria-describedby="helpId" data-role="tagsinput" value="{{ old('tag', $post->id ? getPostTag($post) : '' ) }}">
 </div>
 @push('styles')
     <link rel="stylesheet" href="{{ asset('lib/tagsinput/bootstrap-tagsinput.css') }}">

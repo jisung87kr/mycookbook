@@ -25,4 +25,15 @@ if(!function_exists('getPostMetas')){
         return $post->postMetas()->where('key', $key)->latest();
     }
 }
+
+if(!function_exists('getPostTag')){
+    function getPostTag($post){
+        $taxonomy = $post->taxonomies()->with('term')->where('taxonomy', 'tag')->get();
+        $tagName = [];
+        foreach($taxonomy as $key => $val){
+            array_push($tagName, $val->term->name);
+        }
+        return implode(',', $tagName);
+    }
+}
 ?>
