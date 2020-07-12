@@ -67,7 +67,7 @@ class PostController extends Controller
         $validated = $request->validated();
         $post = $request->user()->posts()->create($validated);
         $this->storeMeta($post, $request);
-        $this->storeTag($post, $request);
+        $this->storeTaxonomies($post, $request);
         $this->storeMaterial($post, $request);
         $this->storeRecipe($post, $request);
         return redirect()->route('posts.show', $post->id);
@@ -146,11 +146,11 @@ class PostController extends Controller
      */
     public function update(Requests\FormRequestPost $request, Post $post)
     {
-        // ddd($request->all());
+        // ddd($request->taxonomy['category']);
         $validated = $request->validated();
         $post->update($validated);
         $this->updateMeta($request);
-        $this->storeTag($post, $request);
+        $this->storeTaxonomies($post, $request);
         $this->storeMaterial($post, $request);
         $this->storeRecipe($post, $request);
         return redirect()->route('posts.show', $post->id);
@@ -230,10 +230,10 @@ class PostController extends Controller
         return $meta;
     }
 
-    public function storeTag($post, $request){
-        if(isset($request->tag)){
-            $termIds = [];
-            $tagArr = explode(',', $request->tag);
+    public function storeTaxonomies($post, $request){
+        $termIds = [];
+        if(isset($request->taxonomy['tag'])){
+            $tagArr = explode(',', $request->taxonomy['tag']);
             foreach($tagArr as $key => $val){
                 $data = [
                     'taxonomy' => 'tag',
@@ -252,14 +252,23 @@ class PostController extends Controller
                 array_push($termIds, $data['id']);
                 $this->storeTaxonomy($post, $data);
             }
-            $post->taxonomies()->where('taxonomy', 'tag')->sync($termIds);
         }
+        // ddd($termIds);
+        if(isset($request->taxonomy['category'])){
+            $taxonomyIds = array_merge($termIds, $request->taxonomy['category']);
+        } else {
+            $taxonomyIds = $termIds;
+        }
+        $result = $post->taxonomies()->sync($taxonomyIds);
+        Taxonomy::whereIn('id', $result['attached'])->increment('count');
+        Taxonomy::whereIn('id', $result['detached'])->decrement('count');
+        // ddd($result);
+        
     }
 
     public function storeTaxonomy($post, $term){
-        if(Taxonomy::find($term['id'])){
-            Taxonomy::find($term['id'])->increment('count');
-        } else {
+        if(!Taxonomy::find($term['id'])){
+            // Taxonomy::find($term['id'])->increment('count');
             Taxonomy::create([
                 'term_id' => $term['id'],
                 'taxonomy' => $term['taxonomy'],

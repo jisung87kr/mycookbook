@@ -4,7 +4,7 @@
         <div class="row">
             @foreach($category as $key => $val)
             <div class="form-check col-6 col-md-4 col-lg-2">
-                <input class="form-check-input" type="checkbox" id="cate_{{ $key }}" name="category[{{$key}}]" value="{{ $val->id }}" @if(in_array($val->id, getTaxonomy($post, 'category')->pluck('id')->toarray())) checked @endif>
+                <input class="form-check-input" type="checkbox" id="cate_{{ $key }}" name="taxonomy[category][]" value="{{ $val->id }}" @if(in_array($val->id, getTaxonomy($post, 'category')->pluck('id')->toarray())) checked @endif>
                 <label class="form-check-label" for="cate_{{ $key }}">{{ $val->term->name }}</label>
             </div>
             @endforeach
@@ -44,7 +44,7 @@
 </div>
 <div class="form-group">
   <label for="tag">태그</label>
-  <input type="text" name="tag" id="tag" class="form-control" placeholder="" aria-describedby="helpId" data-role="tagsinput" value="{{ old('tag', $post->id ? getPostTag($post) : '' ) }}">
+  <input type="text" name="taxonomy[tag]" id="tag" class="form-control" placeholder="" aria-describedby="helpId" data-role="tagsinput" value="{{ old('tag', $post->id ? getPostTag($post) : '' ) }}">
 </div>
 @push('styles')
     <link rel="stylesheet" href="{{ asset('lib/tagsinput/bootstrap-tagsinput.css') }}">
@@ -68,6 +68,7 @@
 
         $('#tag').tagsinput({
             tagClass: 'badge badge-primary', 
+            confirmKeys: [13, 32, 44]
         });
 
         $('.bootstrap-tagsinput input').keydown(function(e){
@@ -77,7 +78,8 @@
         })
 
         $('#tag').on('itemAdded', function(event) {
-            console.log($("#tag").val());
+            // console.log($("#tag").tagsinput('items'));
+            // $("#tag").val($("#tag").tagsinput('items'));
         });
 
         $('[data-toggle="tooltip"]').tooltip();
