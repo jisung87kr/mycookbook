@@ -17,7 +17,8 @@ class Comment extends Model
     }
 
     public function parent(){
-        return $this->belongsTo(Comment::class, 'parent', 'id');
+        // return $this->belongsTo(Comment::class, 'parent', 'id');
+        return $this->belongsTo(Comment::class, 'parent');
     }
 
     public function user(){

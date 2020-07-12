@@ -52,7 +52,8 @@ class PostController extends Controller
     public function create()
     {
         $post = new Post;
-        return view('posts.create', compact('post'));
+        $category = Taxonomy::with('term')->where('taxonomy', 'category')->get();
+        return view('posts.create', compact('post', 'category'));
     }
 
     /**
@@ -72,6 +73,142 @@ class PostController extends Controller
         return redirect()->route('posts.show', $post->id);
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Post $post, Request $request)
+    {
+        $recentPosts = $request->session()->get('recent_posts');
+        if(!empty($recentPosts)) {
+            if(false !== $key = array_search($post->id, $recentPosts)){
+                $request->session()->pull('recent_posts.'.$key, $post->id);
+            }
+            $request->session()->push('recent_posts', $post->id);
+        } else {
+            $request->session()->put('recent_posts', [ $post->id ]);
+        }
+
+        $recentArr = $request->session()->get('recent_posts');
+        $data = [];
+        for($i=0; $i<10; $i++){
+            $val = array_pop($recentArr);
+            if(!empty($val)){
+                array_push($data, $val);
+            }
+        }
+        
+        $recentList = [];
+        foreach($data as $value){
+            $row = Post::find($value);
+            array_push($recentList, $row);
+        }
+        
+        $posts = Post::with('materialClasses.materialUnits.material')->simplePaginate(10);
+        $selectedItems = $request->input('selected_material');
+        $materialList = null;
+
+        if($selectedItems){
+            $materialList = \App\MaterialClass::where('post_id', $post->id)
+            ->leftJoin('material_relationships', 'material_classes.id', '=', 'material_class_id')
+            ->leftJoin('material_units', 'material_units.id', '=', 'material_unit_id')
+            ->leftjoin('materials', 'material_units.material_id', '=', 'materials.id')
+            ->whereNotIn('name', $selectedItems)
+            ->get();
+        } else {
+            $materialList = null;
+        }
+
+        $comments = $post->comments()->with('comments')->where('parent', null)->latest()->get();
+        return view('posts.show', compact('posts', 'post', 'recentList', 'materialList', 'comments'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Post $post)
+    {
+        $category = Taxonomy::with('term')->where('taxonomy', 'category')->get();
+        return view('posts.edit', compact('post', 'category'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Requests\FormRequestPost $request, Post $post)
+    {
+        // ddd($request->all());
+        $validated = $request->validated();
+        $post->update($validated);
+        $this->updateMeta($request);
+        $this->storeTag($post, $request);
+        $this->storeMaterial($post, $request);
+        $this->storeRecipe($post, $request);
+        return redirect()->route('posts.show', $post->id);
+    }
+
+    public function updateMeta($request){
+        PostMeta::find($request->meta['id'])->update([
+            'value' => $request->meta['__video']
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Post $post)
+    {
+        //
+    }
+
+    public function coupang($word){
+        return $word;
+        date_default_timezone_set("GMT+0");
+        $datetime = date("ymd").'T'.date("His").'Z';
+        $method = "POST";
+        $path = "/v2/providers/affiliate_open_api/apis/openapi/v1/deeplink";
+        $message = $datetime.$method.str_replace("?", "", $path);
+        $ACCESS_KEY = "";
+        $SECRET_KEY = "";
+        $algorithm = "HmacSHA256";
+        $signature = hash_hmac('sha256', $message, $SECRET_KEY);
+        // print($message."\n".$SECRET_KEY."\n".$signature."\n");
+        $authorization  = "CEA algorithm=HmacSHA256, access-key=".$ACCESS_KEY.", signed-date=".$datetime.", signature=".$signature;
+        $url = 'https://api-gateway.coupang.com'.$path;
+        $strjson='
+            {
+                "coupangUrls": [
+                    "https://www.coupang.com/np/search?component=&q='.$word.'&channel=user",
+                ]
+            }
+        ';
+
+        $curl = curl_init();        
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type:  application/json;charset=UTF-8", "Authorization:".$authorization));        
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $strjson);
+        $result = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        curl_close($curl);
+        $data = json_decode($result);
+        return $data->data[0]->shortenUrl;
+    }
+
     public function storeMeta($post, $request){
         if(isset($request->meta)){
             foreach($request->meta as $key => $val){
@@ -85,13 +222,19 @@ class PostController extends Controller
         }
     }
 
+    public function getPostMeta($post, $key){
+        $meta = PostMeta::where([
+            'post_id' => $post->id,
+            'key' => $key
+        ])->first();
+        return $meta;
+    }
+
     public function storeTag($post, $request){
         if(isset($request->tag)){
             $termIds = [];
             $tagArr = explode(',', $request->tag);
             foreach($tagArr as $key => $val){
-                //terms 테이블에 해당 용어가 있는지 확인해서 없으면 인서트, 아이디 반환
-                //텍소노미테이블에 아이디를 이용해서 내용저장 || 아이디,텍소노미를 검색해서 용어가 있으면 count 증가
                 $data = [
                     'taxonomy' => 'tag',
                     'description' => null,
@@ -109,7 +252,7 @@ class PostController extends Controller
                 array_push($termIds, $data['id']);
                 $this->storeTaxonomy($post, $data);
             }
-            $post->taxonomies()->sync($termIds);
+            $post->taxonomies()->where('taxonomy', 'tag')->sync($termIds);
         }
     }
 
@@ -183,148 +326,5 @@ class PostController extends Controller
                 $i++;
             }
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Post $post, Request $request)
-    {
-        $recentPosts = $request->session()->get('recent_posts');
-        if(!empty($recentPosts)) {
-            if(false !== $key = array_search($post->id, $recentPosts)){
-                $request->session()->pull('recent_posts.'.$key, $post->id);
-            }
-            $request->session()->push('recent_posts', $post->id);
-        } else {
-            $request->session()->put('recent_posts', [ $post->id ]);
-        }
-
-        $recentArr = $request->session()->get('recent_posts');
-        $data = [];
-        for($i=0; $i<10; $i++){
-            $val = array_pop($recentArr);
-            if(!empty($val)){
-                array_push($data, $val);
-            }
-        }
-        
-        $recentList = [];
-        foreach($data as $value){
-            $row = Post::find($value);
-            array_push($recentList, $row);
-        }
-        
-        $posts = Post::with('materialClasses.materialUnits.material')->simplePaginate(10);
-        $selectedItems = $request->input('selected_material');
-        $materialList = null;
-
-        if($selectedItems){
-            $materialList = \App\MaterialClass::where('post_id', $post->id)
-            ->leftJoin('material_relationships', 'material_classes.id', '=', 'material_class_id')
-            ->leftJoin('material_units', 'material_units.id', '=', 'material_unit_id')
-            ->leftjoin('materials', 'material_units.material_id', '=', 'materials.id')
-            ->whereNotIn('name', $selectedItems)
-            ->get();
-        } else {
-            $materialList = null;
-        }
-
-        $comments = $post->comments()->with('comments')->where('parent', null)->latest()->get();
-        return view('posts.show', compact('posts', 'post', 'recentList', 'materialList', 'comments'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Post $post)
-    {
-        return view('posts.edit', compact('post'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Requests\FormRequestPost $request, Post $post)
-    {
-        // ddd($request->all());
-        $validated = $request->validated();
-        $post->update($validated);
-        $this->updateMeta($request);
-        $this->storeTag($post, $request);
-        $this->storeMaterial($post, $request);
-        $this->storeRecipe($post, $request);
-        return redirect()->route('posts.show', $post->id);
-    }
-
-    public function updateMeta($request){
-        PostMeta::find($request->meta['id'])->update([
-            'value' => $request->meta['__video']
-        ]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Post $post)
-    {
-        //
-    }
-
-    public function coupang($word){
-        return $word;
-        date_default_timezone_set("GMT+0");
-        $datetime = date("ymd").'T'.date("His").'Z';
-        $method = "POST";
-        $path = "/v2/providers/affiliate_open_api/apis/openapi/v1/deeplink";
-        $message = $datetime.$method.str_replace("?", "", $path);
-        $ACCESS_KEY = "5f4fdb1c-8f62-4077-a86b-b14a947c99d7";
-        $SECRET_KEY = "42fffbad486940fffbd4db89aa6ffb504312d3d1";
-        $algorithm = "HmacSHA256";
-        $signature = hash_hmac('sha256', $message, $SECRET_KEY);
-        // print($message."\n".$SECRET_KEY."\n".$signature."\n");
-        $authorization  = "CEA algorithm=HmacSHA256, access-key=".$ACCESS_KEY.", signed-date=".$datetime.", signature=".$signature;
-        $url = 'https://api-gateway.coupang.com'.$path;
-        $strjson='
-            {
-                "coupangUrls": [
-                    "https://www.coupang.com/np/search?component=&q='.$word.'&channel=user",
-                ]
-            }
-        ';
-
-        $curl = curl_init();        
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type:  application/json;charset=UTF-8", "Authorization:".$authorization));        
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $strjson);
-        $result = curl_exec($curl);
-        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        curl_close($curl);
-        $data = json_decode($result);
-        return $data->data[0]->shortenUrl;
-    }
-
-    public function getPostMeta($post, $key){
-        $meta = PostMeta::where([
-            'post_id' => $post->id,
-            'key' => $key
-        ])->first();
-        return $meta;
     }
 }

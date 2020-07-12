@@ -29,11 +29,18 @@ if(!function_exists('getPostMetas')){
 if(!function_exists('getPostTag')){
     function getPostTag($post){
         $taxonomy = $post->taxonomies()->with('term')->where('taxonomy', 'tag')->get();
-        $tagName = [];
+        $arr = [];
         foreach($taxonomy as $key => $val){
-            array_push($tagName, $val->term->name);
+            array_push($arr, $val->term->name);
         }
-        return implode(',', $tagName);
+        return implode(',', $arr);
+    }
+}
+
+if(!function_exists('getTaxonomy')){
+    function getTaxonomy($post, $type){
+        $taxonomy = $post->taxonomies()->with('term')->where('taxonomy', $type)->get();
+        return $taxonomy;
     }
 }
 ?>

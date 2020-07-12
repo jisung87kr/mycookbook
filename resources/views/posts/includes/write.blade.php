@@ -1,4 +1,17 @@
 <div class="form-group">
+    <label for="category">카테고리</label>
+    <div class="container">
+        <div class="row">
+            @foreach($category as $key => $val)
+            <div class="form-check col-6 col-md-4 col-lg-2">
+                <input class="form-check-input" type="checkbox" id="cate_{{ $key }}" name="category[{{$key}}]" value="{{ $val->id }}" @if(in_array($val->id, getTaxonomy($post, 'category')->pluck('id')->toarray())) checked @endif>
+                <label class="form-check-label" for="cate_{{ $key }}">{{ $val->term->name }}</label>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+<div class="form-group">
     <label for="title">제목</label>
     <input type="text" class="form-control @error('title') is-invalid @enderror" name="title" id="title" aria-describedby="helpId" placeholder="제목을 입력하세요" value="{{ old('title', $post->title) }}">
     @error('title')

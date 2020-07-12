@@ -102,7 +102,8 @@
                 <div class="mt-5 mb-3">읽어본글</div>
                 <div class="card mb-2">
                     <div class="card-body">
-                        @forelse($recentList as $list)
+                        @forelse($recentList as $key => $list)
+                        @if(is_null($list)) @continue @endif
                         <div class="media mb-3">
                             <img class="mr-3" src="holder.js/100x60/" alt="">
                             <div class="media-body">
