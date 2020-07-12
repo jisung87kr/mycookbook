@@ -13,7 +13,7 @@ class Recipe extends Model
         return $this->belongsTo(Post::class);
     }
 
-    public function attachments(){
-        return $this->morphMany(Attachment::class, 'attachmentable');
+    public function attachment(){
+        return $this->morphOne(Attachment::class, 'attachmentable');
     }
 }

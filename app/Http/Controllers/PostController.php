@@ -318,6 +318,7 @@ class PostController extends Controller
     }
 
     public function storeRecipe($post, $request){
+        // ddd($request->recipe);
         if(isset($request->recipe)){
             $i=1;
             foreach($request->recipe as $key => $val){
@@ -332,8 +333,22 @@ class PostController extends Controller
                         'content' => $val['content']
                     ]);
                 }
+                $this->storeFile(Recipe::find($val['id']), $val['file']);
                 $i++;
             }
         }
+    }
+
+    public function storeFile($model, $file){
+        // $request = new \Illuminate\Http\Request([], $val);
+        // ddd($request);
+        // ddd($file);
+        $stored = $file->store('images', 'public');
+        $model->attachments()->create([
+            'fname' => $file->getClientOriginalName(),
+            'path' => $stored,
+            'mime' => $file->getClientMimeType(),
+            'byte' => $file->getSize()
+        ]);
     }
 }

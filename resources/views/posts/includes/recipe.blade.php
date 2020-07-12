@@ -24,7 +24,7 @@
     </div>
     <div class="col">
         <label for=""></label>
-        <input type="file" class="form-control-file recipe__file" name="recipe[1][file]" id="" placeholder="" aria-describedby="fileHelpId">
+        <input type="file" class="form-control-file recipe__file" name="recipe[{{$key}}][file]" id="" placeholder="" aria-describedby="fileHelpId">
         <small id="fileHelpId" class="form-text text-muted">요리과정 이미지를 올려주세요.</small>
     </div>
 </div>
