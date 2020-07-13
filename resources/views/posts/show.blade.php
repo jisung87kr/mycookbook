@@ -15,6 +15,12 @@
                         @include('posts.includes.taxonomy', ['post' => $post])
                     </div>
                 </div>
+                <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary mt-3">수정</a>
+                <a href="{{ route('posts.destroy', $post->id) }}" class="btn btn-danger mt-3" onclick="event.preventDefault(); document.getElementById('delete-post').submit()">삭제</a>
+                <form action="{{ route('posts.destroy', $post->id) }}" id="delete-post" method="POST">
+                @csrf
+                @method('DELETE')
+                </form>
                 <div class="row mt-3">
                     @foreach($post->materialClasses as $materialClass)
                     <div class="col-md-6 mb-3">
@@ -80,7 +86,6 @@
                 <div class="commentbox mt-5">
                     @include('comments.index')
                 </div>
-                <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary mt-3 mb-3 mb-lg-0">수정하기</a>
             </div>
             <div class="col-lg-4">
                 <div class="mb-3">내용 더 보기</div>

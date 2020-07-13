@@ -119,8 +119,8 @@
             var el = items.eq(0).clone();
             var max = getMaxNo(items);
             el.attr('data-no', max+1);
-            el.find(".material__name input").attr('name', 'material['+(group.index()+1)+'][item]['+(max+1)+'][name]').val('');
-            el.find(".material__unit input").attr('name', 'material['+(group.index()+1)+'][item]['+(max+1)+'][unit]').val('');
+            el.find(".material__name input").attr('name', 'material['+(group.index())+'][item]['+(max+1)+'][name]').val('');
+            el.find(".material__unit input").attr('name', 'material['+(group.index())+'][item]['+(max+1)+'][unit]').val('');
             $(".material__item__inner", group).append(el);
         });
 

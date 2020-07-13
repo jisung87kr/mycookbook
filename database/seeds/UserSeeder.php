@@ -11,38 +11,43 @@ class UserSeeder extends Seeder
      */
     public function run()
     {
-        factory(App\User::class, 30)->create()->each(function ($user) {
-            $user->posts()->createMany(
-                factory(App\Post::class, 5)->make()->toArray()
-            );
-        });
+        // factory(App\User::class, 30)->create()->each(function ($user) {
+        //     $user->posts()->createMany(
+        //         factory(App\Post::class, 5)->make()->toArray()
+        //     );
+        // });
 
-        $faker = Faker\Factory::create();
-        $users = App\User::all();
-        $posts = App\Post::all();
+        factory(App\User::class)->create([
+            'name' => 'jisung',
+            'email' => 'jisung87kr@gmail.com',
+        ]);
 
-        $posts->each(function($post) use ($faker, $users){
-            $post->comments()->createMany(
-                factory(App\Comment::class, 5)->make([
-                    'user_id' => $faker->randomElement($users->pluck('id')),
-                ])->toArray()
-            );
-        });
+        // $faker = Faker\Factory::create();
+        // $users = App\User::all();
+        // $posts = App\Post::all();
 
-        $comments = App\Comment::all();
-        $comments->each(function($comment) use ($faker, $comments, $users) {
-            for ($i=0; $i < 5; $i++) { 
-                $comment->comments()->create([
-                    'user_id' => $faker->randomElement($users->pluck('id')),
-                    'parent' => $faker->randomElement($comments->where('commentable_id', $comment->commentable_id)->pluck('id')),
-                    'comment' => $faker->paragraph($nbSentences = 10, $variableNbSentences = true),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                    'commentable_type' => $comment->commentable_type,
-                    'commentable_id' => $comment->commentable_id
-                ]);
-            }
-        });
+        // $posts->each(function($post) use ($faker, $users){
+        //     $post->comments()->createMany(
+        //         factory(App\Comment::class, 5)->make([
+        //             'user_id' => $faker->randomElement($users->pluck('id')),
+        //         ])->toArray()
+        //     );
+        // });
+
+        // $comments = App\Comment::all();
+        // $comments->each(function($comment) use ($faker, $comments, $users) {
+        //     for ($i=0; $i < 5; $i++) { 
+        //         $comment->comments()->create([
+        //             'user_id' => $faker->randomElement($users->pluck('id')),
+        //             'parent' => $faker->randomElement($comments->where('commentable_id', $comment->commentable_id)->pluck('id')),
+        //             'comment' => $faker->paragraph($nbSentences = 10, $variableNbSentences = true),
+        //             'created_at' => now(),
+        //             'updated_at' => now(),
+        //             'commentable_type' => $comment->commentable_type,
+        //             'commentable_id' => $comment->commentable_id
+        //         ]);
+        //     }
+        // });
 
         // $users->each(function($user) use ($faker, $posts){
         //     factory(App\Comment::class, 5)->create([

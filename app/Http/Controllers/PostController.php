@@ -174,7 +174,20 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        // taxonomy delete
+        $post->taxonomies()->delete();
+        // material delete
+        foreach($post->materialClasses as $key => $materialClass){
+            $materialClass->materialUnits()->delete();
+        }
+        $post->materialClasses()->delete();
+        // recipe delete
+        foreach($post->recipes as $key => $recipe){
+            $this->deleteRecipe($recipe);
+        }
+        // post delete
+        $post->delete();
+        return redirect()->route('posts.index');
     }
 
     public function coupang($word){
@@ -286,6 +299,9 @@ class PostController extends Controller
     public function storeMaterial($post, $request){
         if(isset($request->material)){
             if(!$post->materialClasses->isEmpty()){
+                foreach($post->materialClasses as $key => $materialClass){
+                    $materialClass->materialUnits()->delete();
+                }
                 $post->materialClasses()->delete();
             }
             

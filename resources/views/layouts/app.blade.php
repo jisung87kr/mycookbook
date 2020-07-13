@@ -40,6 +40,7 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
+                        <a href="{{ route('posts.create') }}">글쓰기</a>
                         <!-- Authentication Links -->
                         @guest
                             <li class="nav-item">
