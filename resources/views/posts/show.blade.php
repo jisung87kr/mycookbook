@@ -68,7 +68,9 @@
                                             {{ $recipe->content }}
                                         </p>
                                     </div>
-                                    <img class="ml-3" src="{{ asset($recipe->attachment->path) }}" alt="" style="max-width: 150px">
+                                    @foreach($recipe->attachments as $key => $val)
+                                    <img class="ml-3" src="{{ asset($val->path) }}" alt="" style="max-width: 150px">
+                                    @endforeach
                                 </div>
                             </div>
                         </div>

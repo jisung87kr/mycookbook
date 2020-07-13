@@ -144,7 +144,12 @@
             var el = recipes.eq(0).clone();
             el.attr('data-no', max+1);
             el.find(".recipe__content").attr('name', 'recipe['+(max+1)+'][content]').val('');
-            el.find(".recipe__file").attr('name', 'recipe['+(max+1)+'][file]').val('');
+            el.find(".recipe-file input").not($(".recipe-file input", el).eq(0)).remove();
+            el.find(".recipe-file small").not($(".recipe-file small", el).eq(0)).remove();
+            el.find(".recipe__file").attr('name', 'recipe['+(max+1)+'][file][]').val('');
+            el.find("img").remove();
+            el.find(".form-check").remove();
+            $("input[type='hidden']", el).remove();
             $(".recipebox").append(el);
         });
 

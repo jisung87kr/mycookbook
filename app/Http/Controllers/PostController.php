@@ -8,11 +8,14 @@ use App\PostMeta;
 use App\Recipe;
 use App\Term;
 use App\Taxonomy;
+use App\Attachment;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Storage;
+
 
 class PostController extends Controller
 {
@@ -64,6 +67,7 @@ class PostController extends Controller
      */
     public function store(Requests\FormRequestPost $request)
     {
+        // ddd($request->all(), is_array($request->recipe[0]['file']));
         $validated = $request->validated();
         $post = $request->user()->posts()->create($validated);
         $this->storeMeta($post, $request);
@@ -146,7 +150,7 @@ class PostController extends Controller
      */
     public function update(Requests\FormRequestPost $request, Post $post)
     {
-        // ddd($request->taxonomy['category']);
+        // ddd($request->recipe);
         $validated = $request->validated();
         $post->update($validated);
         $this->updateMeta($request);
@@ -318,31 +322,66 @@ class PostController extends Controller
     }
 
     public function storeRecipe($post, $request){
-        // ddd($request->recipe);
+        // ddd(Arr::pluck($request->recipe, 'id'));
         if(isset($request->recipe)){
             $i=1;
+            $ids = [];
             foreach($request->recipe as $key => $val){
                 if(isset($val['id'])){
+                    $recipeId = $val['id'];
                     Recipe::find($val['id'])->update([
                         'step' => $i,
                         'content' => $val['content']
                     ]);
+                    // 파일삭제 리스트가 있으면 삭제
+                    if(isset($val['file_delete'])){
+                        foreach($val['file_delete'] as $j => $v){
+                            $del_file = Attachment::find($v);
+                            $this->deleteFile($del_file);
+                        }
+                    }
                 } else {
-                    $post->recipes()->create([
+                    $recipe = $post->recipes()->create([
                         'step' => $i,
                         'content' => $val['content']
                     ]);
+                    $recipeId = $recipe->id;
                 }
-                $this->storeFile(Recipe::find($val['id']), $val['file']);
+                if(isset($val['file'])){
+                    $this->storeFile(Recipe::find($recipeId), $val['file']);
+                }
+
+                array_push($ids, $recipeId);
                 $i++;
+            }
+
+            // 레시피 동기화, 새로등록되거나 수정된 아이디를 제외한 레시피 삭제
+            // ddd($post->recipes->whereNotIn('id', $ids));
+            $delete_recipes = $post->recipes->whereNotIn('id', $ids);
+            foreach($delete_recipes as $k => $delete_recipe){
+                $this->deleteRecipe($delete_recipe);
             }
         }
     }
 
+    public function deleteRecipe(Recipe $recipe){
+        $recipe->delete();
+        foreach($recipe->attachments as $key => $file){
+            $this->deleteFile($file);
+        }
+    }
+
     public function storeFile($model, $file){
-        // $request = new \Illuminate\Http\Request([], $val);
-        // ddd($request);
-        // ddd($file);
+        if(is_array($file)){
+            foreach($file as $key => $val){
+                $this->saveFile($model, $val);    
+            }
+        } else {
+            $this->saveFile($model, $file);
+        }
+    }
+
+    public function saveFile($model, $file){
         $stored = $file->store('images', 'public');
         $model->attachments()->create([
             'fname' => $file->getClientOriginalName(),
@@ -350,5 +389,10 @@ class PostController extends Controller
             'mime' => $file->getClientMimeType(),
             'byte' => $file->getSize()
         ]);
+    }
+
+    public function deleteFile(Attachment $file){
+        Storage::disk('public')->delete($file->path);
+        $file->delete();
     }
 }
