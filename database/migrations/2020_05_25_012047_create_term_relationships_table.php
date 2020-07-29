@@ -14,8 +14,11 @@ class CreateTermRelationshipsTable extends Migration
     public function up()
     {
         Schema::create('term_relationships', function (Blueprint $table) {
-            $table->foreignId('post_id')->constrained()->onDelete('cascade')->primary();
-            $table->foreignId('taxonomy_id')->constrained()->onDelete('cascade')->primary()->index();
+            $table->foreignId('post_id')->constrained()->onDelete('cascade')->onUpdate('cascade')->primary();
+            $table->foreignId('taxonomy_id')->constrained()->onDelete('cascade')->onUpdate('cascade')->primary()->index();
+            // $table->foreignId('post_id')->constrained()->primary();
+            // $table->foreignId('taxonomy_id')->constrained()->primary()->index();
+            
         });
     }
 

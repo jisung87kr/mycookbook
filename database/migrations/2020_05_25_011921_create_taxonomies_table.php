@@ -21,7 +21,7 @@ class CreateTaxonomiesTable extends Migration
             $table->unsignedBigInteger('parent')->default(0);
             $table->unsignedBigInteger('count')->default(0);
             // $table->timestamps();
-            $table->unique(['term_id', 'taxonomy']);
+            // $table->unique(['term_id']);
         });
     }
 

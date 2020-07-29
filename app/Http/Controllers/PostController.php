@@ -68,8 +68,10 @@ class PostController extends Controller
     public function store(Requests\FormRequestPost $request)
     {
         // ddd($request->all(), is_array($request->recipe[0]['file']));
+        // ddd($request->all());
         $validated = $request->validated();
         $post = $request->user()->posts()->create($validated);
+        $this->storeFile($post, $request->thumbnail);
         $this->storeMeta($post, $request);
         $this->storeTaxonomies($post, $request);
         $this->storeMaterial($post, $request);
@@ -388,6 +390,9 @@ class PostController extends Controller
     }
 
     public function storeFile($model, $file){
+        if(is_null($file)){
+            return false;
+        }
         if(is_array($file)){
             foreach($file as $key => $val){
                 $this->saveFile($model, $val);    

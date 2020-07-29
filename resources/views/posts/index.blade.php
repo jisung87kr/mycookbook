@@ -46,10 +46,11 @@
                 </div>
             </div>
             @endif
-        @forelse($posts as $post)
+        @forelse($posts as $post)        
             <div class="col-lg-3 col-md-4 col-6 mb-4">
                 <div class="card">
-                    <img class="card-img-top w-100" src="holder.js/300x180/" alt="">
+                    <!-- <img class="card-img-top w-100" src="holder.js/300x180/" alt=""> -->
+                    <img class="card-img-top w-100" src="{{ isset($post->attachments->first()->path) ? $post->attachments->first()->path : 'holder.js/300x180/' }}" alt="">
                     <div class="card-body">
                         <a href="{{ route('posts.show', [$post->id, 'selected_material' => $selectedMaterial]) }}" class="text-dark">
                             <h4 class="card-title">{{ $post->title }}</h4>

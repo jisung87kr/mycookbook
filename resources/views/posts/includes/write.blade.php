@@ -28,6 +28,12 @@
 </div>
 
 <div class="form-group">
+  <label for="thumbnail">썸네일</label>
+  <input type="file" name="thumbnail" id="thumbnail" class="form-control" aria-describedby="helpId">
+  <small id="helpId" class="text-muted">대표 이미지를 등록하세요</small>
+</div>
+
+<div class="form-group">
     @php
         $postmeta = getPostMeta($post, '__video');
     @endphp

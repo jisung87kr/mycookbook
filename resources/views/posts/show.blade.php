@@ -3,8 +3,17 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
-                <div class="embed-responsive embed-responsive-16by9">
-                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/JIkhS0AbnoQ?rel=0" allowfullscreen></iframe>
+                <div class="mediabox">
+                    @php
+                        $video = getPostMeta($post, '__video')
+                    @endphp
+                    @if(!is_null($video['value']))
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" src="{{$video['value']}}" allowfullscreen></iframe>
+                    </div>
+                    @else
+                    <img src="{{ isset($post->attachments->first()->path) ? $post->attachments->first()->path : 'holder.js/688x400/' }}" alt="">
+                    @endif
                 </div>
                 <div class="card">
                     <div class="card-body">
