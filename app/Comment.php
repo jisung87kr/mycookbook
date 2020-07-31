@@ -3,9 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model
 {
+    use SoftDeletes;
     protected $fillable = ['comment', 'parent', 'user_id', 'commentable_type', 'commentable_id'];
     protected $with =['post', 'user'];
     public function commentable(){

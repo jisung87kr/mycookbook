@@ -65,6 +65,7 @@
     <input type="submit" value="저장" class="btn btn-primary mt-3">
 </div>
 <script defer>
+
     window.addEventListener("load", function(){
         $("form").bind("keypress", function (e) {
             if (e.keyCode == 13) {
@@ -82,11 +83,6 @@
             val = val.replace('#', '');
             $(this).val(val);
         })
-
-        $('#tag').on('itemAdded', function(event) {
-            // console.log($("#tag").tagsinput('items'));
-            // $("#tag").val($("#tag").tagsinput('items'));
-        });
 
         $('[data-toggle="tooltip"]').tooltip();
 

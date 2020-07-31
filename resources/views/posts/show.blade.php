@@ -12,7 +12,7 @@
                         <iframe class="embed-responsive-item" src="{{$video['value']}}" allowfullscreen></iframe>
                     </div>
                     @else
-                    <img src="{{ isset($post->attachments->first()->path) ? $post->attachments->first()->path : 'holder.js/688x400/' }}" alt="">
+                    <img src="{{ isset($post->attachments->first()->path) ? $post->attachments->first()->path : 'holder.js/728x400/' }}" alt="" style="max-width: 100%">
                     @endif
                 </div>
                 <div class="card">
@@ -24,9 +24,11 @@
                         @include('posts.includes.taxonomy', ['post' => $post])
                     </div>
                 </div>
+                @can('edit-post', $post)
                 <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary mt-3">수정</a>
                 <a href="{{ route('posts.destroy', $post->id) }}" class="btn btn-danger mt-3" onclick="event.preventDefault(); document.getElementById('delete-post').submit()">삭제</a>
                 <form action="{{ route('posts.destroy', $post->id) }}" id="delete-post" method="POST">
+                @endcan
                 @csrf
                 @method('DELETE')
                 </form>
@@ -92,7 +94,7 @@
                     </li>
                     @endforeach
                 </ol>
-                <div class="commentbox mt-5">
+                <div class="commentbox mt-5 mb-5 mb-lg-0">
                     @include('comments.index')
                 </div>
             </div>
