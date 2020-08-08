@@ -15,7 +15,7 @@ class Comment extends Model
     }
 
     public function comments(){
-        return $this->hasMany(Comment::class, 'parent')->latest();
+        return $this->hasMany(Comment::class, 'parent')->withTrashed()->latest();
     }
 
     public function parent(){

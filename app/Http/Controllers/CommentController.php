@@ -25,25 +25,22 @@ class CommentController extends Controller
         return redirect()->back();
     }
 
-    public function show(Comment $comment)
-    {
-        //
-    }
-
-    public function edit(Comment $comment)
-    {
-        //
-    }
-
     public function update(Request $request, Comment $comment)
     {
-        //
+        $validated = $request->validate([
+            'post_comment' => 'required'
+        ]);
+        $comment->update([
+            'comment' => $request->post_comment
+        ]);
+        // ddd($validated);
+        return redirect()->back();
     }
 
     public function destroy(Comment $comment)
     {
-        // ddd($comment);
         $comment->delete();
-        return response()->json(null); 
+        return redirect()->back();
+        // return response()->json(null); 
     }
 }

@@ -133,7 +133,7 @@ class PostController extends Controller
             $materialList = null;
         }
 
-        $comments = $post->comments()->with('comments')->where('parent', null)->latest()->get();
+        $comments = $post->comments()->with('comments')->withTrashed()->where('parent', null)->latest()->get();
         return view('posts.show', compact('posts', 'post', 'recentList', 'materialList', 'comments'));
     }
 
