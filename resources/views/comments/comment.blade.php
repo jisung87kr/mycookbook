@@ -7,8 +7,10 @@
             </div>
             <div class="d-inlinebloc float-right">
                 @if(!$comment->trashed())
-                @can('edit-comment', $comment)
+                @can('write-comment', $comment)
                 <a href="" class="btn btn-outline-info btn-sm create-comment">댓글</a>
+                @endcan
+                @can('edit-comment', $comment)
                 <a href="" class="btn btn-outline-secondary btn-sm modify-comment">수정</a>
                 <a href="{{ route('comments.destroy', $comment) }}"
                 class="btn btn-outline-danger btn-sm delete-comment" data-id="{{ $comment->id }}">삭제</a>

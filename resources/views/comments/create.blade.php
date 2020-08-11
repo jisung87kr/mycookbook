@@ -1,4 +1,4 @@
-<form action="{{ route('posts.comments.store', $post) }}" method="POST" class="create-commnet-form">
+<form action="{{ route('posts.comments.store', $post) }}" method="POST" class="create-commnet-form" @if($comment !== null) style='display: none;' @endif >
     @csrf
     @if(isset($comment))
     <input type="hidden" name="comment_parent" value="{{ $comment->id }}">

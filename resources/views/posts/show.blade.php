@@ -7,7 +7,7 @@
                     @php
                         $video = getPostMeta($post, '__video')
                     @endphp
-                    @if(!is_null($video['value']))
+                    @if(isset($video['value']))
                     <div class="embed-responsive embed-responsive-16by9">
                         <iframe class="embed-responsive-item" src="{{$video['value']}}" allowfullscreen></iframe>
                     </div>
